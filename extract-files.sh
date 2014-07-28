@@ -56,9 +56,7 @@ done
 LOCAL_PATH := vendor/samsung/smdk4412-common
 
 PRODUCT_PACKAGES += \\
-    libTVOut \\
-    libUMP \\
-    libfimc
+    libUMP
 
 PRODUCT_COPY_FILES += \\
     \$(LOCAL_PATH)/proprietary/sbin/cbd:root/sbin/cbd
@@ -96,29 +94,9 @@ LOCAL_PATH := \$(call my-dir)
 ifneq (\$(filter i9300 i9305 n7100 n8000 n8013 t0lte t0lteatt t0ltetmo i605 l900 r950,\$(TARGET_DEVICE)),)
 
 include \$(CLEAR_VARS)
-LOCAL_MODULE := libTVOut
-LOCAL_MODULE_OWNER := samsung
-LOCAL_SRC_FILES := system/lib/libTVOut.so
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_SUFFIX := .so
-LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-LOCAL_MODULE_PATH := \$(TARGET_OUT)/lib
-include \$(BUILD_PREBUILT)
-
-include \$(CLEAR_VARS)
 LOCAL_MODULE := libUMP
 LOCAL_MODULE_OWNER := samsung
 LOCAL_SRC_FILES := system/lib/libUMP.so
-LOCAL_MODULE_TAGS := optional
-LOCAL_MODULE_SUFFIX := .so
-LOCAL_MODULE_CLASS := SHARED_LIBRARIES
-LOCAL_MODULE_PATH := \$(TARGET_OUT)/lib
-include \$(BUILD_PREBUILT)
-
-include \$(CLEAR_VARS)
-LOCAL_MODULE := libfimc
-LOCAL_MODULE_OWNER := samsung
-LOCAL_SRC_FILES := system/lib/libfimc.so
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE_SUFFIX := .so
 LOCAL_MODULE_CLASS := SHARED_LIBRARIES
