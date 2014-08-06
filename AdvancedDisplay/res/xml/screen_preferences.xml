@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:advanceddisplay="http://schemas.android.com/apk/res/com.cyanogenmod.settings.device" >
 
     <!-- Screen -->
     <PreferenceCategory
@@ -31,6 +32,29 @@
                 android:entries="@array/mdnie_negative_entries"
                 android:entryValues="@array/mdnie_negative_entries_values"
                 android:defaultValue="0" />
+    </PreferenceCategory>
+
+    <!-- Touchwake -->
+    <PreferenceCategory
+            android:title="@string/touchwake_title">
+
+        <SwitchPreference
+                android:key="touchwake_enable"
+                android:title="@string/touchwake_enable_title"
+                android:summary="@string/touchwake_enable_summary"
+                android:persistent="true"
+                android:defaultValue="false" />
+
+        <com.cyanogenmod.settings.device.SeekBarPreference
+                android:key="touchwake_timeout"
+                android:title="@string/touchwake_timeout_title"
+                android:max="30"
+                advanceddisplay:min="1"
+                advanceddisplay:unitsLeft=""
+                advanceddisplay:unitsRight=" Seconds"
+                android:persistent="true"
+                android:dependency="touchwake_enable"
+                android:defaultValue="5" />
     </PreferenceCategory>
 
 </PreferenceScreen>

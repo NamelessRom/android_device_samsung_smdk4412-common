@@ -30,4 +30,11 @@
     <string name="mdnie_negative_title_head">Negative Mode</string>
     <string name="mdnie_negative_summary_head">Enable/Disable inverted colors</string>
 
+    <!-- Touchwake -->
+    <string name="kernel_does_not_support">Kernel does not support</string>
+    <string name="touchwake_title">Touchwake</string>
+    <string name="touchwake_enable_title">Enable</string>
+    <string name="touchwake_enable_summary">Wake up device on screen touch shortly after it sleeps</string>
+    <string name="touchwake_timeout_title">Timeout</string>
+
 </resources>
