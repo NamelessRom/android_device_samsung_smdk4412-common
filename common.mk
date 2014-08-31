@@ -170,4 +170,4 @@ TARGET_OMX_PATH := hardware/samsung/exynos/multimedia/openmax
 $(call inherit-product, hardware/samsung/exynos4x12.mk)
 
 # Include non-opensource parts
-$(call inherit-product, vendor/samsung/smdk4412-common/common-vendor.mk)
+$(call inherit-product, vendor/samsung_own/smdk4412-common/common-vendor.mk)
