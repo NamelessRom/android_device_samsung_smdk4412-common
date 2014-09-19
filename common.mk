@@ -162,7 +162,11 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
 
+ifneq ($(TARGET_NEEDS_INCREASED_HEAP),true)
 $(call inherit-product, frameworks/native/build/phone-xhdpi-1024-dalvik-heap.mk)
+else
+$(call inherit-product, frameworks/native/build/phone-xhdpi-2048-dalvik-heap.mk)
+endif
 
 # Include exynos4 platform specific parts
 TARGET_HAL_PATH := hardware/samsung_slsi/exynos4
