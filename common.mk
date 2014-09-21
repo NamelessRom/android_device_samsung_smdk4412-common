@@ -73,6 +73,7 @@ PRODUCT_PACKAGES := \
     libnetcmdiface \
     libsecion \
     libsync \
+    libUMP \
     lights.exynos4 \
     macloader \
     tinymix
