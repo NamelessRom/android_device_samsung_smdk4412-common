@@ -28,7 +28,6 @@ system/lib/libMcVersion.so
 system/lib/libQmageDecoder.so
 system/lib/libquramimagecodec.so
 system/lib/libsecnativefeature.so
-system/lib/libUMP.so
 system/media/battery_batteryerror.qmg
 system/media/battery_charging_100.qmg
 system/media/battery_charging_10.qmg
