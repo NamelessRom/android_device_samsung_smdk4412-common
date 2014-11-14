@@ -51,6 +51,13 @@ PRODUCT_COPY_FILES += \
 PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/configs/wpa_supplicant.conf:system/etc/wifi/wpa_supplicant.conf
 
+PRODUCT_PACKAGES := \
+    hostapd \
+    hostapd_default.conf \
+    dhcpcd.conf \
+    libwpa_client \
+    wpa_supplicant
+
 PRODUCT_PROPERTY_OVERRIDES += \
     wifi.interface=wlan0 \
     wifi.supplicant_scan_interval=15
@@ -60,7 +67,7 @@ PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/configs/gps.conf:system/etc/gps.conf
 
 # Packages
-PRODUCT_PACKAGES := \
+PRODUCT_PACKAGES += \
     AdvancedDisplay \
     audio.a2dp.default \
     audio.primary.smdk4x12 \
