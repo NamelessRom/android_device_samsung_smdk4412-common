@@ -102,9 +102,6 @@ BOARD_USES_MFC_FPS := true
 BOARD_USE_S3D_SUPPORT := true
 BOARD_USE_CSC_FIMC := false
 
-# RIL
-BOARD_MOBILEDATA_INTERFACE_NAME := "pdp0"
-
 # Wifi
 BOARD_WLAN_DEVICE                := bcmdhd
 BOARD_WLAN_DEVICE_REV            := bcm4334
