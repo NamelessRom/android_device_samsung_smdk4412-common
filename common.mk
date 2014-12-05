@@ -173,6 +173,10 @@ PRODUCT_TAGS += dalvik.gc.type-precise
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
     persist.sys.usb.config=mtp
 
+# Default to AwesomePlayer
+PRODUCT_PROPERTY_OVERRIDES += \
+    media.stagefright.use-awesome=true
+
 # Include exynos4 platform specific parts
 TARGET_HAL_PATH := hardware/samsung_slsi/exynos4
 TARGET_OMX_PATH := hardware/samsung/exynos/multimedia/openmax
