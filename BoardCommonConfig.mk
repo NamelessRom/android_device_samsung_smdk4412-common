@@ -54,7 +54,7 @@ TARGET_PROVIDES_INIT := true
 TARGET_PROVIDES_INIT_TARGET_RC := true
 
 # Kernel
-BOARD_KERNEL_CMDLINE := "console=ttySAC2,115200"
+BOARD_KERNEL_CMDLINE := console=ttySAC2,115200
 BOARD_KERNEL_BASE := 0x40000000
 BOARD_KERNEL_PAGESIZE := 2048
 
@@ -106,6 +106,12 @@ BOARD_USE_METADATABUFFERTYPE := true
 BOARD_USES_MFC_FPS := true
 BOARD_USE_S3D_SUPPORT := true
 BOARD_USE_CSC_FIMC := false
+
+# Include an expanded selection of fonts
+EXTENDED_FONT_FOOTPRINT := true
+
+# Logging
+TARGET_USES_LOGD := false
 
 # Wifi
 BOARD_WLAN_DEVICE                := bcmdhd
