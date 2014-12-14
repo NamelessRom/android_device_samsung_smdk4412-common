@@ -76,6 +76,8 @@ PRODUCT_PACKAGES += \
     com.android.future.usb.accessory \
     gralloc.exynos4 \
     hwcomposer.exynos4 \
+    libExynosHWCService \
+    libExynosIPService \
     libfimg \
     libnetcmdiface \
     libsecion \
@@ -164,8 +166,7 @@ PRODUCT_COPY_FILES += \
 # Graphics
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.zygote.disable_gl_preload=1 \
-    ro.opengles.version=131072 \
-    ro.bq.gpu_to_cpu_unsupported=1
+    ro.opengles.version=131072
 
 PRODUCT_TAGS += dalvik.gc.type-precise
 
