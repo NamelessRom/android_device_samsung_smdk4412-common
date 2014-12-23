@@ -71,8 +71,11 @@ service ueventd /sbin/ueventd
 service console /system/bin/sh
     console
 
+service healthd-charger /sbin/healthd -n
+    critical
+
 service lpm /system/bin/lpm
-    user root
+    critical
 
 on post-fs-data
      # we will remap this as /mnt/sdcard with the sdcard fuse tool
