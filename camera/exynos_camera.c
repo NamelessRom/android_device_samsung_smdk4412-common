@@ -3667,8 +3667,8 @@ int exynos_camera_send_command(struct camera_device *dev,
 {
 	struct exynos_camera *exynos_camera;
 	exynos_camera = (struct exynos_camera *) dev->priv;
-
-	ALOGD("%s(%p, %d, %d, %d)", __func__, dev, cmd, arg1, arg2);
+	if (cmd != 8)
+		ALOGD("%s(%p, %d, %d, %d)", __func__, dev, cmd, arg1, arg2);
 	switch (cmd) {
 		case CAMERA_CMD_START_FACE_DETECTION:
 			if (setFaceDetect(exynos_camera, FACE_DETECTION_ON) < 0) {
