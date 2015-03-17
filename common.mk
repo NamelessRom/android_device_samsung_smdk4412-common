@@ -53,15 +53,13 @@ PRODUCT_COPY_FILES += \
 
 PRODUCT_PACKAGES := \
     hostapd \
-    hostapd_default.conf \
     dhcpcd.conf \
     libwpa_client \
     wpa_supplicant \
     wpa_supplicant.conf
 
 PRODUCT_PROPERTY_OVERRIDES += \
-    wifi.interface=wlan0 \
-    wifi.supplicant_scan_interval=15
+    wifi.interface=wlan0
 
 # Gps
 PRODUCT_COPY_FILES += \
