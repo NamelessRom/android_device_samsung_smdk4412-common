@@ -3259,7 +3259,7 @@ int exynos_camera_set_preview_window(struct camera_device *dev,
 		goto error;
 	}
 
-	rc = w->set_usage(w, GRALLOC_USAGE_CAMERA | GRALLOC_USAGE_HW_FIMC1 | GRALLOC_USAGE_EXTERNAL_DISP | GRALLOC_USAGE_SW_WRITE_OFTEN);
+	rc = w->set_usage(w, GRALLOC_USAGE_CAMERA | GRALLOC_USAGE_HW_ION | GRALLOC_USAGE_EXTERNAL_DISP | GRALLOC_USAGE_SW_WRITE_OFTEN);
 	if (rc) {
 		ALOGE("%s: Unable to set usage", __func__);
 		goto error;
