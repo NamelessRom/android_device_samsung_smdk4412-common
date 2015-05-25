@@ -30,6 +30,7 @@
 #include <sys/time.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
+#include <sys/syscall.h>
 
 #include <asm/types.h>
 
@@ -1750,6 +1751,14 @@ void *exynos_camera_capture_thread(void *data)
 
 	ALOGE("%s: Starting thread", __func__);
 	exynos_camera->capture_thread_running = 1;
+
+	int err, mask = 1 << 0;
+	pid_t pid = gettid();
+	rc = syscall(__NR_sched_setaffinity, pid, sizeof(mask), &mask);
+	if (rc) {
+		err = errno;
+		ALOGE("%s: Error in the syscall setaffinity: mask=%d=0x%x err=%d=0x%x", __func__, mask, mask, err, err);
+	}
 
 	while (exynos_camera->capture_thread_enabled) {
 		pthread_mutex_lock(&exynos_camera->capture_lock_mutex);
