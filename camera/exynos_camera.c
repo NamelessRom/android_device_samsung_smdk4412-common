@@ -113,7 +113,7 @@ struct exynos_camera_preset exynos_camera_presets_smdk4x12[] = {
 			.recording_format = "yuv420sp",
 
 			.focus_mode = "auto",
-			.focus_mode_values = "auto,infinity,macro,fixed,continuous-picture,continuous-video",
+			.focus_mode_values = "auto,infinity,macro,fixed",
 			.focus_distances = "0.15,1.20,Infinity",
 			.focus_areas = "(0,0,0,0,0)",
 			.max_num_focus_areas = 1,
@@ -1103,7 +1103,8 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 
 	focus_mode_string = exynos_param_string_get(exynos_camera, "focus-mode");
 	if (focus_mode_string != NULL) {
-		if (focus_mode == FOCUS_MODE_DEFAULT) {
+		ALOGE("%s focus_mode_string=%s focus_mode=%d", __func__, focus_mode_string, focus_mode);
+		if ((focus_mode == FOCUS_MODE_DEFAULT) || (focus_mode != FOCUS_MODE_TOUCH)) {
 			if (strcmp(focus_mode_string, "auto") == 0)
 				focus_mode = FOCUS_MODE_AUTO;
 			else if (strcmp(focus_mode_string, "infinity") == 0)
@@ -1114,10 +1115,6 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 				focus_mode = FOCUS_MODE_FIXED;
 			else if (strcmp(focus_mode_string, "facedetect") == 0)
 				focus_mode = FOCUS_MODE_FACEDETECT;
-			else if (strcmp(focus_mode_string, "continuous-video") == 0)
-				focus_mode = FOCUS_MODE_CONTINOUS_VIDEO;
-			else if (strcmp(focus_mode_string, "continuous-picture") == 0)
-				focus_mode = FOCUS_MODE_CONTINOUS_PICTURE;
 			else {
 				exynos_param_string_set(exynos_camera, "focus-mode",
 					exynos_camera->raw_focus_mode);
@@ -1126,6 +1123,13 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 		}
 
 		if (focus_mode != exynos_camera->focus_mode || force) {
+			/* expose auto for camera app, but send continous to sensor */
+			if (focus_mode == FOCUS_MODE_AUTO)
+				if (exynos_camera->camera_sensor_mode == SENSOR_MOVIE)
+					focus_mode = FOCUS_MODE_CONTINOUS_VIDEO;
+				else
+					focus_mode = FOCUS_MODE_CONTINOUS_PICTURE;
+
 			rc = exynos_v4l2_s_ctrl(exynos_camera, 0, V4L2_CID_CAMERA_FOCUS_MODE, focus_mode);
 			if (rc < 0)
 				ALOGE("%s: Unable to set focus mode", __func__);
