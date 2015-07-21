@@ -41,6 +41,16 @@
 
 #define BIG2LITTLE_ENDIAN(big)	((big & 0xff) << 24 | (big & 0xff00) << 8 | (big & 0xff0000) >> 8 | (big & 0xff000000) >> 24)
 
+static struct exynos_camera *s_exynos_camera = NULL;
+static int current_camera_id = 0;
+
+#ifdef EXYNOS_ION
+static int s_ion_fd = -1;
+#endif
+
+static int s_fimc0_initialized = 0;
+static int s_fimc0_fd = -1;
+
 /*
  * Devices configurations
  */
@@ -292,56 +302,6 @@ int exynos_camera_start(struct exynos_camera *exynos_camera, int id)
 	if (exynos_camera == NULL || id >= exynos_camera->config->presets_count)
 		return -EINVAL;
 
-	// ION
-
-#ifdef EXYNOS_ION
-	rc = exynos_ion_init(exynos_camera);
-	if (rc < 0) {
-		ALOGE("%s: Unable to init ION", __func__);
-		goto error;
-	}
-
-	rc = exynos_ion_open(exynos_camera);
-	if (rc < 0) {
-		ALOGE("%s: Unable to open ION", __func__);
-		goto error;
-	}
-#endif
-
-	// V4L2
-
-	rc = exynos_v4l2_init(exynos_camera);
-	if (rc < 0) {
-		ALOGE("%s: Unable to init v4l2", __func__);
-		goto error;
-	}
-
-	// FIMC0
-
-	rc = exynos_v4l2_open(exynos_camera, 0);
-	if (rc < 0) {
-		ALOGE("%s: Unable to open v4l2 device", __func__);
-		goto error;
-	}
-
-	rc = exynos_v4l2_querycap_cap(exynos_camera, 0);
-	if (rc < 0) {
-		ALOGE("%s: Unable to query capabilities", __func__);
-		goto error;
-	}
-
-	rc = exynos_v4l2_enum_input(exynos_camera, 0, id);
-	if (rc < 0) {
-		ALOGE("%s: Unable to enumerate input", __func__);
-		goto error;
-	}
-
-	rc = exynos_v4l2_s_input(exynos_camera, 0, id);
-	if (rc < 0) {
-		ALOGE("%s: Unable to set inputs", __func__);
-		goto error;
-	}
-
 	// Recording
 
 	exynos_camera->recording_metadata = 1;
@@ -364,12 +324,6 @@ int exynos_camera_start(struct exynos_camera *exynos_camera, int id)
 	goto complete;
 
 error:
-	exynos_v4l2_close(exynos_camera, 0);
-
-#ifdef EXYNOS_ION
-	exynos_ion_close(exynos_camera);
-#endif
-
 	rc = -1;
 
 complete:
@@ -383,12 +337,6 @@ void exynos_camera_stop(struct exynos_camera *exynos_camera)
 
 	if (exynos_camera == NULL || exynos_camera->config == NULL)
 		return;
-
-	exynos_v4l2_close(exynos_camera, 0);
-
-#ifdef EXYNOS_ION
-	exynos_ion_close(exynos_camera);
-#endif
 }
 
 // Params
@@ -1861,6 +1809,10 @@ void exynos_camera_capture_thread_stop(struct exynos_camera *exynos_camera)
 
 	exynos_camera->capture_enabled = 0;
 	exynos_camera->capture_thread_enabled = 0;
+	s_exynos_camera->capture_enabled = 0;
+	s_exynos_camera->capture_thread_enabled = 0;
+
+	ALOGD("%s exynos_camera=0x%x s_exynos_camera=0x%x", __func__, exynos_camera, s_exynos_camera);
 
 	pthread_mutex_unlock(&exynos_camera->capture_lock_mutex);
 
@@ -3758,10 +3710,6 @@ int exynos_camera_close(hw_device_t *device)
 
 	camera_device = (struct camera_device *) device;
 
-	if (camera_device->priv != NULL) {
-		free(camera_device->priv);
-	}
-
 	free(camera_device);
 
 	return 0;
@@ -3776,7 +3724,7 @@ int exynos_camera_open(const struct hw_module_t* module, const char *camera_id,
 	int rc;
 
 	ALOGD("%s(%p, %s, %p)", __func__, module, camera_id, device);
-
+	ALOGD("s_exynos_camera=0x%x current_camera_id=%d s_ion_fd=%d s_fimc0_initialized=%d", s_exynos_camera, current_camera_id, s_ion_fd, s_fimc0_initialized);
 	if (module == NULL || camera_id == NULL || device == NULL)
 		return -EINVAL;
 
@@ -3784,19 +3732,107 @@ int exynos_camera_open(const struct hw_module_t* module, const char *camera_id,
 	if (id < 0)
 		return -EINVAL;
 
-	exynos_camera = calloc(1, sizeof(struct exynos_camera));
-	exynos_camera->config = exynos_camera_config;
+	if (s_exynos_camera == NULL || current_camera_id != id) {
+		if (s_exynos_camera != NULL)
+			free(s_exynos_camera);
 
-	if (exynos_camera->config->v4l2_nodes_count > EXYNOS_CAMERA_MAX_V4L2_NODES_COUNT)
-		goto error_preset;
+		ALOGD("Initializing exynos_camera");
+		exynos_camera = calloc(1, sizeof(struct exynos_camera));
+		exynos_camera->config = exynos_camera_config;
 
-	if (id >= exynos_camera->config->presets_count)
-		goto error_preset;
+		if (exynos_camera->config->v4l2_nodes_count > EXYNOS_CAMERA_MAX_V4L2_NODES_COUNT)
+			goto error_preset;
 
-	rc = exynos_camera_start(exynos_camera, id);
-	if (rc < 0) {
-		ALOGE("%s: Unable to start camera", __func__);
-		goto error;
+		if (id >= exynos_camera->config->presets_count)
+			goto error_preset;
+
+		// ION
+
+#ifdef EXYNOS_ION
+		if (s_ion_fd <= 0) {
+			ALOGD("Initializing ION");
+			rc = exynos_ion_init(exynos_camera);
+			if (rc < 0) {
+				ALOGE("%s: Unable to init ION", __func__);
+				goto error_preset;
+			}
+
+			rc = exynos_ion_open(exynos_camera);
+			if (rc < 0) {
+				ALOGE("%s: Unable to open ION", __func__);
+				goto error_preset;
+			}
+
+			s_ion_fd = exynos_camera->ion_fd;
+		} else {
+			ALOGD("ION already initialized s_ion_fd=%d", s_ion_fd);
+			exynos_camera->ion_fd = s_ion_fd;
+		}
+#endif
+
+		// V4L2
+
+		if (current_camera_id != id && s_exynos_camera) {
+			// Deinitialize FIMC0 due to camera switch
+			ALOGD("Closing FIMC0");
+			exynos_v4l2_close(s_exynos_camera, 0);
+			close(s_fimc0_fd);
+			s_fimc0_initialized = 0;
+			s_fimc0_fd = -1;
+		}
+
+		if (s_fimc0_initialized == 0 || s_fimc0_fd <= 0) {
+			ALOGD("Initializing FIMC0");
+			rc = exynos_v4l2_init(exynos_camera);
+			if (rc < 0) {
+				ALOGE("%s: Unable to init v4l2", __func__);
+				goto error;
+			}
+
+			// FIMC0
+
+			rc = exynos_v4l2_open(exynos_camera, 0);
+			if (rc < 0) {
+				ALOGE("%s: Unable to open v4l2 device", __func__);
+				goto error_fimc0;
+			}
+
+			rc = exynos_v4l2_querycap_cap(exynos_camera, 0);
+			if (rc < 0) {
+				ALOGE("%s: Unable to query capabilities", __func__);
+				goto error_fimc0;
+			}
+
+			rc = exynos_v4l2_enum_input(exynos_camera, 0, id);
+			if (rc < 0) {
+				ALOGE("%s: Unable to enumerate input", __func__);
+				goto error_fimc0;
+			}
+
+			rc = exynos_v4l2_s_input(exynos_camera, 0, id);
+			if (rc < 0) {
+				ALOGE("%s: Unable to set inputs", __func__);
+				goto error_fimc0;
+			}
+
+			s_fimc0_initialized = 1;
+			s_fimc0_fd = exynos_camera->v4l2_fds[0];
+		} else {
+			ALOGD("FIMC0 already initialized exynos_camera->v4l2_fds[0]=%d", exynos_camera->v4l2_fds[0]);
+			exynos_camera->v4l2_fds[0] = s_fimc0_fd;
+		}
+
+		rc = exynos_camera_start(exynos_camera, id);
+		if (rc < 0) {
+			ALOGE("%s: Unable to start camera", __func__);
+			goto error;
+		}
+
+		current_camera_id = id;
+		s_exynos_camera = exynos_camera;
+	} else {
+		ALOGD("exynos_camera already initialized s_exynos_camera->capture_enabled=%d s_exynos_camera->capture_thread_enabled=%d", s_exynos_camera->capture_enabled, s_exynos_camera->capture_thread_enabled);
+		exynos_camera = s_exynos_camera;
 	}
 
 	rc = exynos_camera_capture_thread_start(exynos_camera);
@@ -3817,6 +3853,9 @@ int exynos_camera_open(const struct hw_module_t* module, const char *camera_id,
 	*device = (struct hw_device_t *) &(camera_device->common);
 
 	return 0;
+
+error_fimc0:
+	exynos_v4l2_close(exynos_camera, 0);
 
 error:
 	exynos_camera_stop(exynos_camera);
@@ -3840,6 +3879,16 @@ int exynos_camera_get_number_of_cameras(void)
 		ALOGE("%s: Unable to find proper camera config", __func__);
 		return -1;
 	}
+
+	s_exynos_camera = NULL;
+	current_camera_id = 0;
+
+#ifdef EXYNOS_ION
+	s_ion_fd = -1;
+#endif
+
+	s_fimc0_initialized = 0;
+	s_fimc0_fd = -1;
 
 	return exynos_camera_config->presets_count;
 }
