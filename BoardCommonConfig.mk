@@ -84,6 +84,21 @@ BOARD_USES_PROPRIETARY_HWC := true
 # PIE
 TARGET_NEEDS_NON_PIE_SUPPORT := true
 
+# ART
+# Enable dex-preoptimization to speed up first boot sequence
+ifeq ($(HOST_OS),linux)
+  ifeq ($(TARGET_BUILD_VARIANT),user)
+    ifeq ($(WITH_DEXPREOPT),)
+      WITH_DEXPREOPT := true
+    endif
+  endif
+endif
+ART_USE_HSPACE_COMPACT=true
+
+# dlmalloc
+MALLOC_IMPL := dlmalloc
+
+
 # FIMG Acceleration
 BOARD_USES_FIMGAPI := true
 BOARD_USES_SKIA_FIMGAPI := true
