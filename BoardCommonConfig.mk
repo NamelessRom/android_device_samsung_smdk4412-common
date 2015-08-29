@@ -87,6 +87,9 @@ TARGET_NEEDS_NON_PIE_SUPPORT := true
 # ART
 ART_USE_HSPACE_COMPACT=true
 
+# dlmalloc
+MALLOC_IMPL := dlmalloc
+
 # FIMG Acceleration
 BOARD_USES_FIMGAPI := true
 BOARD_USES_SKIA_FIMGAPI := true
