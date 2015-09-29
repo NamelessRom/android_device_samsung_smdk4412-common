@@ -18,8 +18,6 @@ COMMON_PATH := device/samsung/smdk4412-common
 
 DEVICE_PACKAGE_OVERLAYS := $(COMMON_PATH)/overlay
 
-PRODUCT_BUILD_PROP_OVERRIDES += BUILD_UTC_DATE=0
-
 $(call inherit-product, $(SRC_TARGET_DIR)/product/languages_full.mk)
 
 # The gps config appropriate for this device
@@ -87,11 +85,6 @@ PRODUCT_PACKAGES += \
     macloader \
     tinymix
 
-ifneq ($(TARGET_HAS_CAM_FLASH) ,false)
-PRODUCT_PACKAGES += \
-    Torch
-endif
-
 # MFC API
 PRODUCT_PACKAGES += \
     libsecmfcdecapi \
@@ -121,18 +114,6 @@ PRODUCT_PACKAGES += \
     static_busybox \
     make_ext4fs \
     setup_fs
-
-# Live Wallpapers
-PRODUCT_PACKAGES += \
-    Galaxy4 \
-    HoloSpiralWallpaper \
-    LiveWallpapers \
-    LiveWallpapersPicker \
-    MagicSmokeWallpapers \
-    NoiseField \
-    PhaseBeam \
-    VisualizationWallpapers \
-    librs_jni
 
 # Charger
 PRODUCT_PACKAGES += \
@@ -164,6 +145,10 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.software.sip.voip.xml:system/etc/permissions/android.software.sip.voip.xml \
     frameworks/native/data/etc/android.software.sip.xml:system/etc/permissions/android.software.sip.xml
 
+# Live Wallpapers
+PRODUCT_PACKAGES += \
+    librs_jni
+
 # Feature live wallpaper
 PRODUCT_COPY_FILES += \
     packages/wallpapers/LivePicker/android.software.live_wallpaper.xml:system/etc/permissions/android.software.live_wallpaper.xml
@@ -172,8 +157,6 @@ PRODUCT_COPY_FILES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.zygote.disable_gl_preload=1 \
     ro.opengles.version=131072
-
-PRODUCT_TAGS += dalvik.gc.type-precise
 
 # Set default USB interface
 PRODUCT_DEFAULT_PROPERTY_OVERRIDES += \
