@@ -15,24 +15,29 @@
  -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string-array name="mdnie_scenario_entries">
-        <item>CyanogenMod (por defecto)</item>
-        <item>UI</item>
+        <item>UI (por defecto)</item>
         <item>Vídeo</item>
-        <item>Vídeo cálido</item>
-        <item>Vídeo frío</item>
         <item>Camara</item>
         <item>Navegación</item>
         <item>Galería</item>
         <item>VT</item>
+        <item>Navegador web</item>
+        <item>Lectura</item>
+        <item>Correo</item>
+        <item>Tono color 1</item>
+        <item>Tono color 2</item>
+        <item>Tono color 3</item>
     </string-array>
     <string-array name="mdnie_mode_entries">
-        <item>Estándar (por defecto)</item>
-        <item>Dinámico</item>
+        <item>Dinámico (por defecto)</item>
+        <item>Estándar</item>
         <item>Natural</item>
         <item>Película</item>
+        <item>Automático</item>
     </string-array>
-    <string-array name="mdnie_negative_entries">
-        <item>Normal</item>
-        <item>Invertido</item>
+    <string-array name="mdnie_accessibility_entries">
+        <item>Desactivado</item>
+        <item>Colores invertidos</item>
+        <item>Daltonismo</item>
     </string-array>
 </resources>

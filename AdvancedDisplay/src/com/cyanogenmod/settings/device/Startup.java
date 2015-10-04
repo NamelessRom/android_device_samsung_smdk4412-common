@@ -26,7 +26,7 @@ public class Startup extends BroadcastReceiver {
     public void onReceive(final Context context, final Intent bootintent) {
         mDNIeScenario.restore(context);
         mDNIeMode.restore(context);
-        mDNIeNegative.restore(context);
+        mDNIeAccessibility.restore(context);
         ScreenFragmentActivity.restore(context);
     }
 }
