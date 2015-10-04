@@ -10,6 +10,8 @@ LOCAL_SRC_FILES := $(call all-java-files-under, src)
 LOCAL_PACKAGE_NAME := AdvancedDisplay
 LOCAL_CERTIFICATE := platform
 
+LOCAL_AAPT_FLAGS += --rename-manifest-package org.namelessrom.device.extra
+
 include $(BUILD_PACKAGE)
 
 include $(call all-makefiles-under,$(LOCAL_PATH))
