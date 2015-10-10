@@ -155,7 +155,8 @@ PRODUCT_COPY_FILES += \
 
 # Graphics
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.zygote.disable_gl_preload=1 \
+    ro.zygote.disable_gl_preload=true \
+    debug.hwui.render_dirty_regions=false \
     ro.opengles.version=131072
 
 # Set default USB interface
