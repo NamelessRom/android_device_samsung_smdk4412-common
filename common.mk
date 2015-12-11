@@ -77,6 +77,7 @@ PRODUCT_PACKAGES += \
     hwcomposer.exynos4 \
     libExynosHWCService \
     libExynosIPService \
+    libhdmiclient \
     libfimg \
     libnetcmdiface \
     libsecion \
