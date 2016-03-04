@@ -80,6 +80,7 @@ PRODUCT_PACKAGES += \
     libhdmiclient \
     libfimg \
     libnetcmdiface \
+    libril_shim \
     libsecion \
     libstlport \
     libsync \

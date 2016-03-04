@@ -6,6 +6,8 @@ import /init.smdk4x12.usb.rc
 
 on init
 
+    export LD_SHIM_LIBS /system/lib/libsec-ril.so|libril_shim.so
+
 # Support legacy paths
     symlink /sdcard /mnt/sdcard
     symlink /sdcard /storage/sdcard0
