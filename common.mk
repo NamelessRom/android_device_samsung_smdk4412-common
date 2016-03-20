@@ -84,6 +84,7 @@ PRODUCT_PACKAGES += \
     libstlport \
     libsync \
     libUMP \
+    libwvm-compat \
     lights.exynos4 \
     macloader \
     Snap \
