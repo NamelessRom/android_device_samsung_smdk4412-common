@@ -120,10 +120,12 @@ EXTENDED_FONT_FOOTPRINT := true
 TARGET_USES_LOGD := false
 
 # Enable dexpreopt to speed boot time
-ifeq ($(HOST_OS),linux)
-  ifeq ($(WITH_DEXPREOPT),)
-    WITH_DEXPREOPT := true
-    WITH_DEXPREOPT_BOOT_IMG_ONLY := true
+ifeq ($(HOST_IS_JENKINS)
+  ifeq ($(HOST_OS),linux)
+    ifeq ($(WITH_DEXPREOPT),)
+      WITH_DEXPREOPT := true
+      WITH_DEXPREOPT_BOOT_IMG_ONLY := true
+    endif
   endif
 endif
 
