@@ -1,0 +1,9 @@
+type macloader, domain;
+type macloader_exec, exec_type, file_type;
+init_daemon_domain(macloader);
+
+allow macloader efs_file:dir { search };
+allow macloader efs_device_file:dir { search };
+allow macloader system_data_file:dir w_dir_perms;
+allow macloader wifi_data_file:file { getattr setattr read open write };
+allow macloader self:capability { chown dac_override fowner fsetid };

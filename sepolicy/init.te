@@ -1,0 +1,2 @@
+domain_trans(init, rootfs, macloader);
+domain_trans(init, rootfs, tinyplay);
