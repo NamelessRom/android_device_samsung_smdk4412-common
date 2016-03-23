@@ -177,5 +177,8 @@ BACKLIGHT_PATH := /sys/class/backlight/panel/brightness
 # Override healthd HAL
 BOARD_HAL_STATIC_LIBRARIES := libhealthd.exynos4
 
+# SELinux
+BOARD_SEPOLICY_DIRS += device/samsung/smdk4412-common/sepolicy
+
 # inherit from the proprietary version
 -include vendor/samsung/smdk4412-common/BoardConfigVendor.mk
