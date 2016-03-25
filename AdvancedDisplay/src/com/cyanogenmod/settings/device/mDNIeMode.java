@@ -25,6 +25,8 @@ import android.preference.ListPreference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceManager;
 
+import org.namelessrom.settings.device.R;
+
 public class mDNIeMode extends ListPreference implements OnPreferenceChangeListener {
 
     private static String FILE = null;
