@@ -30,7 +30,7 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 
-import com.cyanogenmod.settings.device.R;
+import org.namelessrom.settings.device.R;
 
 public class SeekBarPreference extends Preference implements OnSeekBarChangeListener {
 
