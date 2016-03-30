@@ -713,6 +713,9 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 	char *image_stabilization_string;
 	int image_stabilization;
 
+	int correct_preview_h;
+	int correct_preview_w;
+
 	int w, h;
 	char *k;
 	int rc, i;
@@ -833,19 +836,54 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 			exynos_camera->recording_format = recording_format;
 	}
 
+	// Picture size
+	picture_size_string = exynos_param_string_get(exynos_camera, "picture-size");
+	if (picture_size_string != NULL) {
+		sscanf(picture_size_string, "%dx%d", &picture_width, &picture_height);
+
+		if (picture_width != 0 && picture_height != 0 && (picture_width != exynos_camera->picture_width || picture_height != exynos_camera->picture_height)) {
+			exynos_camera->picture_width = picture_width;
+			exynos_camera->picture_height = picture_height;
+
+			if (!exynos_camera->camera_fimc_is) {
+				rc = exynos_v4l2_s_ctrl(exynos_camera, 0, V4L2_CID_CAMERA_JPEG_RESOLUTION, (picture_width & 0xffff) << 16 | (picture_height & 0xffff));
+				if (rc < 0)
+					ALOGE("%s: Unable to set jpeg resolution", __func__);
+			}
+		}
+	}
+
 	recording_hint_string = exynos_param_string_get(exynos_camera, "recording-hint");
 	if (recording_hint_string != NULL && strcmp(recording_hint_string, "true") == 0) {
 		camera_sensor_mode = SENSOR_MOVIE;
 
+		correct_preview_h = recording_height;
+		correct_preview_w = recording_width;
+
+		if (exynos_camera->camera_fimc_is)
+			fimc_is_mode = IS_MODE_PREVIEW_VIDEO;
+	} else {
+		camera_sensor_mode = SENSOR_CAMERA;
+
+		correct_preview_h = picture_height;
+		correct_preview_w = picture_width;
+
+		if (exynos_camera->camera_fimc_is)
+			fimc_is_mode = IS_MODE_PREVIEW_STILL;
+	}
+
+	// Correct the aspect ratio
+
+	if ((correct_preview_w * preview_height) / correct_preview_h != preview_width) {
 		k = exynos_param_string_get(exynos_camera, "preview-size-values");
-		while (recording_width != 0 && recording_height != 0) {
+		while (true) {
 			if (k == NULL)
 				break;
 
 			sscanf(k, "%dx%d", &w, &h);
 
 			// Look for same aspect ratio
-			if ((recording_width * h) / recording_height == w) {
+			if ((correct_preview_w * h) / correct_preview_h == w) {
 				preview_width = w;
 				preview_height = h;
 				break;
@@ -863,48 +901,26 @@ int exynos_camera_params_apply(struct exynos_camera *exynos_camera, int force)
 		if (preview_height != 0 && preview_height != exynos_camera->preview_height)
 			exynos_camera->preview_height = preview_height;
 
-		if (exynos_camera->camera_fimc_is)
-			fimc_is_mode = IS_MODE_PREVIEW_VIDEO;
-	} else {
-		camera_sensor_mode = SENSOR_CAMERA;
-
-		if (exynos_camera->camera_fimc_is)
-			fimc_is_mode = IS_MODE_PREVIEW_STILL;
+		ALOGD("%s: Correcting Preview Aspect Ratio to match Picture/Recording Size (%dx%d)", __func__, preview_width, preview_height);
 	}
 
-	// Picture size and Video Snapshot Resolution
-	picture_size_string = exynos_param_string_get(exynos_camera, "picture-size");
-	if (picture_size_string != NULL) {
-		sscanf(picture_size_string, "%dx%d", &picture_width, &picture_height);
+	// Video Snapshot Resolution
 
-		if (camera_sensor_mode == SENSOR_MOVIE) {
-			//Set Video Recording SnapShot Resolutions
-			if (exynos_camera->camera_videosnapshot_resolutions != NULL) {
-				//Back Camera
-				if (!exynos_camera->camera_fimc_is) {
-					for (i = 0; i < exynos_camera->camera_videosnapshot_resolutions_count; i++) {
-						if (exynos_camera->camera_videosnapshot_resolutions[i].video_width == exynos_camera->recording_width && exynos_camera->camera_videosnapshot_resolutions[i].video_height == exynos_camera->recording_height) {
-							picture_width = exynos_camera->camera_videosnapshot_resolutions[i].snapshot_width;
-							picture_height = exynos_camera->camera_videosnapshot_resolutions[i].snapshot_height;
-							break;
-						}
-					}
-				} else {
-					//Front Facing Camera - Use Recording size as Snapshot size
-					picture_width = exynos_camera->recording_width;
-					picture_height = exynos_camera->recording_height;
-				}
-			}
-		}
-
-		if (picture_width != 0 && picture_height != 0 && (picture_width != exynos_camera->picture_width || picture_height != exynos_camera->picture_height)) {
-			exynos_camera->picture_width = picture_width;
-			exynos_camera->picture_height = picture_height;
-
+	if (camera_sensor_mode == SENSOR_MOVIE) {
+		if (exynos_camera->camera_videosnapshot_resolutions != NULL) {
+			//Back Camera
 			if (!exynos_camera->camera_fimc_is) {
-				rc = exynos_v4l2_s_ctrl(exynos_camera, 0, V4L2_CID_CAMERA_JPEG_RESOLUTION, (picture_width & 0xffff) << 16 | (picture_height & 0xffff));
-				if (rc < 0)
-					ALOGE("%s: Unable to set jpeg resolution", __func__);
+				for (i = 0; i < exynos_camera->camera_videosnapshot_resolutions_count; i++) {
+					if (exynos_camera->camera_videosnapshot_resolutions[i].video_width == exynos_camera->recording_width && exynos_camera->camera_videosnapshot_resolutions[i].video_height == exynos_camera->recording_height) {
+						picture_width = exynos_camera->camera_videosnapshot_resolutions[i].snapshot_width;
+						picture_height = exynos_camera->camera_videosnapshot_resolutions[i].snapshot_height;
+						break;
+					}
+				}
+			} else {
+				//Front Facing Camera - Use Recording size as Snapshot size
+				picture_width = exynos_camera->recording_width;
+				picture_height = exynos_camera->recording_height;
 			}
 		}
 	}
