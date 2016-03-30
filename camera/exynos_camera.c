@@ -47,22 +47,21 @@
 
 struct exynos_camera_mbus_resolution exynos_camera_mbus_resolutions_s5k6a3_smdk4x12[] = {
 	// 16:9 ratio
-	{ 1280, 720,	1344, 756 },
+	{ 1280, 720, 1344, 756 },
 	// 4:3 ratio
-	{ 1280, 960,	1392, 1044 },
+	{ 1280, 960, 1392, 1044 },
 	{ 960, 720,	1392, 1044 },
 	{ 640, 480,	1392, 1044 },
 	{ 320, 240,	1392, 1044 },
 	// 1:1 ratio
-	{ 1392, 1392,	1392, 1392 },
-	{ 704, 704,	1392, 1392 },
+	{ 1392, 1392, 1392, 1392 },
 	{ 320, 320,	1392, 1392 },
 };
 
 struct exynos_camera_videosnapshot_resolution exynos_camera_videosnapshot_resolutions_s5c73m3[] = {
 	//Capture Size - Snapshot Size
-	{ 1920, 1080,	3264, 1836 },
-	{ 1280, 720,	3264, 1836 },
+	{ 1920, 1080, 3264, 1836 },
+	{ 1280, 720, 3264, 1836 },
 	{ 720, 480,	3264, 2176 },
 	{ 640, 480,	3264, 2488 },
 	{ 352, 288,	3264, 2488 },
@@ -86,7 +85,7 @@ struct exynos_camera_preset exynos_camera_presets_smdk4x12[] = {
 		.vertical_view_angle = 49.3f,
 		.metering = METERING_CENTER,
 		.params = {
-			.preview_size_values = "960x720,1280x720,1184x666,960x640,704x576,640x480,352x288,320x240",
+			.preview_size_values = "960x720,1280x720,960x640,640x480,352x288,320x240",
 			.preview_size = "960x720",
 			.preview_format_values = "yuv420sp,yuv420p,rgb565",
 			.preview_format = "yuv420sp",
@@ -179,7 +178,7 @@ struct exynos_camera_preset exynos_camera_presets_smdk4x12[] = {
 		.vertical_view_angle = 52.58f,
 		.metering = METERING_CENTER,
 		.params = {
-			.preview_size_values = "1280x720,960x720,640x480,320x240,704x704,320x320",
+			.preview_size_values = "1280x720,960x720,640x480,320x240,320x320",
 			.preview_size = "960x720",
 			.preview_format_values = "yuv420sp,yuv420p,rgb565",
 			.preview_format = "yuv420sp",
@@ -248,7 +247,7 @@ struct exynos_camera_preset exynos_camera_presets_smdk4x12[] = {
 			.image_stabilization_values = "off",
 		},
 		.mbus_resolutions = (struct exynos_camera_mbus_resolution *) &exynos_camera_mbus_resolutions_s5k6a3_smdk4x12,
-		.mbus_resolutions_count = 8,
+		.mbus_resolutions_count = 7,
 	},
 };
 
